@@ -1,34 +1,23 @@
 class Api::V1::AppsController < ApplicationController
   def create
-    app_name = "cheetah"
-    heroku_json = JSON.parse(deploy(app_name))
+    client = create_and_deploy
 
-    if heroku_json.key?("created_at")
-      render json: { url: "https://#{app_name}.herokuapp.com" }, status: 201
+    if client.succeeded?
+      render json: { url: client.app_url }, status: 201
     else
-      render json: heroku_json, status: 502
+      render json: client.error_response, status: 502
     end
   end
 
   private
 
-  def deploy(app_name)
-    begin
-      heroku.app_setup.create(
-        app: {
-          name: app_name,
-          personal: true,
-        },
-        source_blob: {
-          url: ENV.fetch("URL_OF_TAR_GZ_TO_DEPLOY"),
-        }
-      )
-    rescue => error
-      error.response.body
+  def create_and_deploy
+    HerokuClient.new(app_name).tap do |client|
+      client.create_and_deploy
     end
   end
 
-  def heroku
-    @heroku ||= PlatformAPI.connect_oauth(ENV.fetch("HEROKU_OAUTH_TOKEN"))
+  def app_name
+    "cheetah"
   end
 end
