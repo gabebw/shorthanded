@@ -1,6 +1,6 @@
 class Api::V1::AppsController < ApplicationController
   def create
-    client = create_and_deploy
+    client = create_and_deploy(app_name)
 
     if client.succeeded?
       render json: { url: client.app_url }, status: 201
@@ -11,13 +11,14 @@ class Api::V1::AppsController < ApplicationController
 
   private
 
-  def create_and_deploy
+  def create_and_deploy(app_name)
     HerokuClient.new(app_name).tap do |client|
       client.create_and_deploy
     end
   end
 
   def app_name
-    "cheetah"
+    site_id = SecureRandom.urlsafe_base64(8)
+    "shorthanded-#{site_id}"
   end
 end

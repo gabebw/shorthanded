@@ -57,6 +57,12 @@ describe "POST /api/apps" do
   end
 
   def app_name
-    "cheetah"
+    id = 1
+    stub_site_id(id)
+    "shorthanded-#{id}"
+  end
+
+  def stub_site_id(id)
+    allow(SecureRandom).to receive(:urlsafe_base64).with(8).and_return(id)
   end
 end
