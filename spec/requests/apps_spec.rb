@@ -3,14 +3,18 @@ require "rails_helper"
 describe "POST /api/apps" do
   context "when it succeeds" do
     it "responds with the URL of the new Heroku app" do
+      stub_dnsimple_client
       stub_app_setup(app_name)
 
       api_post api_apps_path
 
-      expect(json_body["url"]).to eq "https://#{app_name}.herokuapp.com"
+      expect(json_body["url"]).to eq(
+        "http://#{subdomain}.#{ENV.fetch("DNSIMPLE_DOMAIN")}"
+      )
     end
 
     it "responds with 201 Created" do
+      stub_dnsimple_client
       stub_app_setup(app_name)
 
       api_post api_apps_path
@@ -19,7 +23,7 @@ describe "POST /api/apps" do
     end
   end
 
-  context "when it fails" do
+  context "when Heroku fails" do
     it "returns 502 (Bad Response from Upstream Server)" do
       stub_failed_app_setup
 
@@ -57,7 +61,27 @@ describe "POST /api/apps" do
   end
 
   def app_name
-    @app_name ||= stub_app_name("abcdef1234")
+    @app_name ||= stub_app_name("abcdef-1234")
+  end
+
+  def stub_dnsimple_client
+    client = double("DnsimpleClient")
+    allow(client).to receive(:register_cname).with(
+      subdomain,
+      "https://#{app_name}.herokuapp.com"
+    ).and_return("http://#{subdomain}.#{ENV.fetch("DNSIMPLE_DOMAIN")}")
+    allow(DnsimpleClient).to receive(:new).and_return(client)
+  end
+
+  def subdomain
+    @subdomain ||= stub_subdomain("secret-pine")
+  end
+
+  def stub_subdomain(name)
+    generator = double("SubdomainNameGenerator")
+    allow(generator).to receive(:generate).and_return(name)
+    allow(SubdomainNameGenerator).to receive(:new).and_return(generator)
+    name
   end
 
   def stub_app_name(id)
