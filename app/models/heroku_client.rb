@@ -6,7 +6,7 @@ class HerokuClient
 
   def create_and_deploy
     begin
-      @body = client.app_setup.create(
+      @json_body = client.app_setup.create(
         app: {
           name: app_name,
           personal: true,
@@ -16,7 +16,7 @@ class HerokuClient
         }
       )
     rescue Excon::Errors::ClientError => error
-      @body = error.response.body
+      @json_body = JSON.parse(error.response.body)
     end
   end
 
@@ -29,14 +29,10 @@ class HerokuClient
   end
 
   def error_response
-    @body
+    json_body
   end
 
   private
 
-  attr_reader :app_name, :client
-
-  def json_body
-    JSON.parse(@body)
-  end
+  attr_reader :app_name, :client, :json_body
 end

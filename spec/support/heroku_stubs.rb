@@ -2,13 +2,21 @@ module HerokuStubs
   def stub_app_setup(app_name)
     stub_request(:post, "https://api.heroku.com/app-setups").
       with(body: request_body(app_name)).
-      to_return(status: 201, body: app_setup_body(app_name))
+      to_return(
+        status: 201,
+        body: app_setup_body(app_name),
+        headers: { "Content-Type" => "application/json" }
+      )
   end
 
   def stub_failed_app_setup(options = {})
     stub_request(:post, "https://api.heroku.com/app-setups").
       with(body: request_body(app_name)).
-      to_return(status: 422, body: failed_app_setup_body(options))
+      to_return(
+        status: 422,
+        body: failed_app_setup_body(options),
+        headers: { "Content-Type" => "application/json" }
+      )
   end
 
   def app_setup_body(app_name)
