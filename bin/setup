@@ -15,8 +15,8 @@ if [ ! -f .env ]; then
   cp .sample.env .env
 fi
 
-# Set up database and add any development seed data
-bundle exec rake db:setup dev:prime
+# Set up database
+bundle exec rake db:setup
 
 # Add binstubs to PATH via export PATH=".git/safe/../../bin:$PATH" in ~/.zshenv
 mkdir -p .git/safe
@@ -32,8 +32,10 @@ if ! command -v foreman > /dev/null; then
 fi
 
 # Only if this isn't CI
-# if [ -z "$CI" ]; then
-# fi
+if [ -z "$CI" ]; then
+  # Add any development seed data
+  bundle exec rake dev:prime
+fi
 
 # Set up the staging and production apps.
 if heroku join --app shorthanded-staging &> /dev/null; then
