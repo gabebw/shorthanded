@@ -2,11 +2,11 @@
 # they're easy to find in the Heroku console.
 #
 # Heroku has the following rules about app names:
-# * Must be <30 characters long
+# * Must be <= 30 characters long
 # * Must start with a letter
 # * Can only contain lowercase letters, numbers, and dashes
 class HerokuAppNameGenerator
-  PREFIX = "shorthanded-"
+  PREFIX = "shorty-"
 
   def generate
     PREFIX + random_string
@@ -15,6 +15,6 @@ class HerokuAppNameGenerator
   private
 
   def random_string
-    SecureRandom.urlsafe_base64(8).downcase.gsub("_", "-")
+    SecureRandom.urlsafe_base64(15).downcase.gsub("_", "-")
   end
 end

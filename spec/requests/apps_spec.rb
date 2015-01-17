@@ -61,7 +61,7 @@ describe "POST /api/apps" do
   end
 
   def stub_app_name(id)
-    name = "shorthanded-#{id}"
+    name = HerokuAppNameGenerator::PREFIX + "-#{id}"
     generator = double("app name generator", generate: name)
     allow(HerokuAppNameGenerator).to receive(:new).and_return(generator)
     name

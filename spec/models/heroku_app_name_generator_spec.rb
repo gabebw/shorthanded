@@ -2,10 +2,10 @@ require "rails_helper"
 
 describe HerokuAppNameGenerator do
   context "#generate" do
-    it "prefixes nams with 'shorthanded-'" do
+    it "prefixes the name with 'shorty-'" do
       name = HerokuAppNameGenerator.new.generate
 
-      expect(name).to start_with "shorthanded-"
+      expect(name).to start_with "shorty-"
     end
 
     it "adds a short random string to the end" do
@@ -15,6 +15,12 @@ describe HerokuAppNameGenerator do
       name = HerokuAppNameGenerator.new.generate
 
       expect(name).to end_with base64
+    end
+
+    it "generates a name <= 30 characters long" do
+      name = HerokuAppNameGenerator.new.generate
+
+      expect(name.size).to be <= 30
     end
 
     it "downcases the app name" do
@@ -37,6 +43,6 @@ describe HerokuAppNameGenerator do
   end
 
   def stub_secure_random(base64)
-    allow(SecureRandom).to receive(:urlsafe_base64).with(8).and_return(base64)
+    allow(SecureRandom).to receive(:urlsafe_base64).with(15).and_return(base64)
   end
 end
