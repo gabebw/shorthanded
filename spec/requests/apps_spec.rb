@@ -4,7 +4,7 @@ describe "POST /api/apps" do
   context "when it succeeds" do
     it "responds with the URL of the new Heroku app" do
       stub_dnsimple_client
-      stub_app_setup(app_name)
+      stub_heroku(app_name)
 
       api_post api_apps_path
 
@@ -14,8 +14,8 @@ describe "POST /api/apps" do
     end
 
     it "responds with 201 Created" do
+      stub_heroku(app_name)
       stub_dnsimple_client
-      stub_app_setup(app_name)
 
       api_post api_apps_path
 
@@ -65,6 +65,11 @@ describe "POST /api/apps" do
     @app_name ||= stub_app_name("abcdef-1234")
   end
 
+  def stub_heroku(app_name)
+    stub_app_setup(app_name)
+    stub_heroku_domain(app_name, domain_for_heroku)
+  end
+
   def stub_dnsimple_client
     client = double("DnsimpleClient")
     allow(client).to receive(:register_cname).with(
@@ -76,6 +81,10 @@ describe "POST /api/apps" do
 
   def subdomain
     @subdomain ||= stub_subdomain("secret-pine")
+  end
+
+  def domain_for_heroku
+    "#{subdomain}.#{ENV.fetch("DNSIMPLE_DOMAIN")}"
   end
 
   def stub_subdomain(name)

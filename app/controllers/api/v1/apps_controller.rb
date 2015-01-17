@@ -2,11 +2,12 @@ class Api::V1::AppsController < ApplicationController
   def create
     heroku_client = create_and_deploy(app_name)
 
-    if heroku_client.succeeded?
+    if heroku_client.creation_succeeded?
       full_domain = register_cname(heroku_client.app_url)
+      heroku_client.add_domain(full_domain)
       render json: { url: full_domain }, status: 201
     else
-      render json: heroku_client.error_response, status: 502
+      render json: heroku_client.creation_error_response, status: 502
     end
   end
 

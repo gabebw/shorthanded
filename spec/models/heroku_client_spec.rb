@@ -18,7 +18,7 @@ describe HerokuClient do
         client = HerokuClient.new(app_name)
         client.create_and_deploy
 
-        expect(client.succeeded?).to eq true
+        expect(client.creation_succeeded?).to eq true
       end
 
       context "when unsuccessful" do
@@ -32,13 +32,46 @@ describe HerokuClient do
           client = HerokuClient.new(app_name)
           client.create_and_deploy
 
-          expect(client.error_response).to eq response.stringify_keys
+          expect(client.creation_error_response).to eq response.stringify_keys
         end
       end
     end
   end
 
+  context "#add_domain" do
+    it "adds a domain to the app" do
+      request = stub_heroku_domain(app_name, domain)
+      client = HerokuClient.new(app_name)
+
+      client.add_domain(domain)
+
+      expect(request).to have_been_requested
+    end
+
+    it "removes http:// from the domain before adding" do
+      request = stub_heroku_domain(app_name, domain)
+      client = HerokuClient.new(app_name)
+
+      client.add_domain("http://" + domain)
+
+      expect(request).to have_been_requested
+    end
+
+    it "removes https:// from the domain before adding" do
+      request = stub_heroku_domain(app_name, domain)
+      client = HerokuClient.new(app_name)
+
+      client.add_domain("https://" + domain)
+
+      expect(request).to have_been_requested
+    end
+  end
+
   def app_name
     "shorty-abc"
+  end
+
+  def domain
+    "example.com"
   end
 end

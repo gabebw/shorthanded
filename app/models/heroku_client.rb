@@ -20,7 +20,12 @@ class HerokuClient
     end
   end
 
-  def succeeded?
+  def add_domain(domain)
+    domain_without_scheme = domain.sub(%r{https?://}, "")
+    client.domain.create(app_name, hostname: domain_without_scheme)
+  end
+
+  def creation_succeeded?
     json_body.key?("created_at")
   end
 
@@ -28,7 +33,7 @@ class HerokuClient
     "https://#{app_name}.herokuapp.com"
   end
 
-  def error_response
+  def creation_error_response
     json_body
   end
 

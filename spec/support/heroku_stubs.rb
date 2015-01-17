@@ -1,6 +1,18 @@
 module HerokuStubs
+  BASE_URL = "https://api.heroku.com"
+
+  def stub_heroku_domain(app_name, domain)
+    stub_request(:post, api_url("/apps/#{app_name}/domains")).
+      with(body: domain_request_body(domain)).
+      to_return(
+        status: 201,
+        body: domain_response_body(domain),
+        headers: { "Content-Type" => "application/json" }
+      )
+  end
+
   def stub_app_setup(app_name)
-    stub_request(:post, "https://api.heroku.com/app-setups").
+    stub_request(:post, api_url("/app-setups")).
       with(body: request_body(app_name)).
       to_return(
         status: 201,
@@ -10,7 +22,7 @@ module HerokuStubs
   end
 
   def stub_failed_app_setup(app_name, options = {})
-    stub_request(:post, "https://api.heroku.com/app-setups").
+    stub_request(:post, api_url("/app-setups")).
       with(body: request_body(app_name)).
       to_return(
         status: 422,
@@ -60,6 +72,23 @@ module HerokuStubs
         url: ENV.fetch("URL_OF_TAR_GZ_TO_DEPLOY"),
       }
     }.to_json
+  end
+
+  def domain_request_body(domain)
+    { hostname: domain }.to_json
+  end
+
+  def domain_response_body(domain)
+    {
+      created_at: "2012-01-01T12:00:00Z",
+      hostname: domain,
+      id: "01234567-89ab-cdef-0123-456789abcdef",
+      updated_at: "2012-01-01T12:00:00Z"
+    }.to_json
+  end
+
+  def api_url(path)
+    BASE_URL + path
   end
 end
 
