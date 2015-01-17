@@ -1,4 +1,4 @@
-class Api::V1::AppsController < ApplicationController
+class Api::V1::AppsController < Api::V1::ApisController
   def create
     heroku_client = create_and_deploy(app_name)
 

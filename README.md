@@ -11,7 +11,10 @@ deployment of the application.
 
 `POST /apps`
 
-Required header: `Accept: application/vnd.shorthanded+json; version=1`
+Required headers:
+
+* `Accept: application/vnd.shorthanded+json; version=1`
+* `X-App-Secret: {Whatever you set $HEADER_SECRET to in the env}`
 
 Returns JSON.
 
@@ -51,6 +54,7 @@ controlled by environment variables:
 | `URL_OF_TAR_GZ_TO_DEPLOY` | Heroku has an API to take in .tar.gz of apps with an [app.json](https://devcenter.heroku.com/articles/app-json-schema) in the root. If you add an `app.json` to your app on GitHub, GitHub will gladly generate a .tar.gz for you on the fly using a URL like `https://github.com/gabebw/shorthanded/tarball/master` | https://github.com/gabebw/shorthanded/tarball/branch-name |
 | `DNSIMPLE_DOMAIN` | The domain name (WITHOUT a scheme like `http://`) to add a subdomain for. Must have DNS controlled by DNSimple. |  `example.com` |
 | `DNSIMPLE_DOMAIN_TOKEN` | DNSimple has a couple different ways to authenticate against [their API]. Shorthanded uses the domain token because it gives the least access to a user's account. You can find it under the "settings" for a specific domain on DNSimple's website. | 3125f1af24979e2f821ef829bc8040a5 |
+| `HEADER_SECRET` | A secret token that must be sent with the headers of every request. It prevents random people from creating a lot of Heroku apps on your behalf. | secret |
 
 [their docs]: https://github.com/heroku/platform-api#a-real-world-example
 [their API]: http://developer.dnsimple.com/overview/

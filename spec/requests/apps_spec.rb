@@ -57,7 +57,8 @@ describe "POST /api/apps" do
   def headers
     {
       "Content-Type" => "application/json",
-      "Accept" => "application/vnd.shorthanded+json; version=1"
+      "Accept" => "application/vnd.shorthanded+json; version=1",
+      "X-App-Secret" => ENV.fetch("HEADER_SECRET"),
     }
   end
 
