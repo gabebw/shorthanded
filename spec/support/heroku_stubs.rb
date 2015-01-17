@@ -9,7 +9,7 @@ module HerokuStubs
       )
   end
 
-  def stub_failed_app_setup(options = {})
+  def stub_failed_app_setup(app_name, options = {})
     stub_request(:post, "https://api.heroku.com/app-setups").
       with(body: request_body(app_name)).
       to_return(
@@ -64,5 +64,5 @@ module HerokuStubs
 end
 
 RSpec.configure do |config|
-  config.include HerokuStubs, type: :request
+  config.include HerokuStubs
 end

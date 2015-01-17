@@ -25,7 +25,7 @@ describe "POST /api/apps" do
 
   context "when Heroku fails" do
     it "returns 502 (Bad Response from Upstream Server)" do
-      stub_failed_app_setup
+      stub_failed_app_setup(app_name)
 
       api_post api_apps_path
 
@@ -34,6 +34,7 @@ describe "POST /api/apps" do
 
     it "returns the Heroku error message" do
       stub_failed_app_setup(
+        app_name,
         id: "foo_bar",
         message: "Foo failed to bar"
       )
