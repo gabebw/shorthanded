@@ -6,7 +6,7 @@
 # * Must start with a letter
 # * Can only contain lowercase letters, numbers, and dashes
 class HerokuAppNameGenerator
-  PREFIX = "shorty-"
+  PREFIX = ENV.fetch("HEROKU_APP_NAME_PREFIX")
 
   def generate
     PREFIX + random_string

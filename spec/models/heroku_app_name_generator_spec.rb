@@ -2,10 +2,11 @@ require "rails_helper"
 
 describe HerokuAppNameGenerator do
   context "#generate" do
-    it "prefixes the name with 'shorty-'" do
+    it "uses the prefix from the environment" do
+      prefix = ENV.fetch("HEROKU_APP_NAME_PREFIX")
       name = HerokuAppNameGenerator.new.generate
 
-      expect(name).to start_with "shorty-"
+      expect(name).to start_with prefix
     end
 
     it "adds a short random string to the end" do

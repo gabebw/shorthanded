@@ -68,7 +68,7 @@ describe HerokuClient do
   end
 
   def app_name
-    "shorty-abc"
+    ENV.fetch("HEROKU_APP_NAME_PREFIX") + "abc"
   end
 
   def domain
