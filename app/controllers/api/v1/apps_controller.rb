@@ -18,7 +18,6 @@ class Api::V1::AppsController < ApplicationController
   end
 
   def app_name
-    site_id = SecureRandom.urlsafe_base64(8)
-    "shorthanded-#{site_id}"
+    @app_name ||= HerokuAppNameGenerator.new.generate
   end
 end

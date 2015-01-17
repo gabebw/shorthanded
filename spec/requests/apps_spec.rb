@@ -57,12 +57,13 @@ describe "POST /api/apps" do
   end
 
   def app_name
-    id = 1
-    stub_site_id(id)
-    "shorthanded-#{id}"
+    @app_name ||= stub_app_name("abcdef1234")
   end
 
-  def stub_site_id(id)
-    allow(SecureRandom).to receive(:urlsafe_base64).with(8).and_return(id)
+  def stub_app_name(id)
+    name = "shorthanded-#{id}"
+    generator = double("app name generator", generate: name)
+    allow(HerokuAppNameGenerator).to receive(:new).and_return(generator)
+    name
   end
 end
