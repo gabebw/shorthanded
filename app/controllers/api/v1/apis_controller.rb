@@ -1,5 +1,5 @@
 class Api::V1::ApisController < ApplicationController
-  before_filter :authorize_app_secret
+  before_action :authorize_app_secret
 
   private
 
