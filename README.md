@@ -16,9 +16,9 @@ deployment of the application. The unique URL is a Heroku-esque subdomain like
    generated apps easy to find in your Heroku console.
 3. As part of the app creation, the Heroku app deploys the .tar.gz containing
    the code of another app. The URL of the .tar.gz is given by
-   `$URL_OF_TAR_GZ_TO_DEPLOY`). The .tar.gz must have an [app.json] in the root,
-   which will tell Heroku what environment variables to set and generally how to
-   deploy that app.
+   `$URL_OF_TAR_GZ_TO_DEPLOY`. The .tar.gz must be an app with an [app.json] in
+   the root, which will tell Heroku what environment variables to set and
+   generally how to deploy that app.
 4. A random Heroku-esque subdomain is created on your DNSimple domain.
 5. The subdomain is mapped to the Heroku application
 6. Voila, it's all wired up, from DNSimple -> Heroku.
