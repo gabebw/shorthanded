@@ -4,7 +4,7 @@ describe "POST /api/apps" do
   context "when it succeeds" do
     it "responds with the URL of the new Heroku app" do
       subdomain = "cool-subdomain"
-      stub_dnsimple_client(subdomain)
+      stub_successful_cname_registration(app_name, subdomain)
       stub_heroku(app_name, subdomain)
 
       api_post api_apps_path, subdomain
@@ -16,8 +16,8 @@ describe "POST /api/apps" do
 
     it "responds with 201 Created" do
       subdomain = "cool-subdomain"
+      stub_successful_cname_registration(app_name, subdomain)
       stub_heroku(app_name, subdomain)
-      stub_dnsimple_client(subdomain)
 
       api_post api_apps_path, subdomain
 
@@ -27,21 +27,25 @@ describe "POST /api/apps" do
 
   context "when Heroku fails" do
     it "returns 502 (Bad Response from Upstream Server)" do
+      subdomain = "cool-subdomain"
+      stub_successful_cname_registration(app_name, subdomain)
       stub_failed_app_setup(app_name)
 
-      api_post api_apps_path, "cool-subdomain"
+      api_post api_apps_path, subdomain
 
       expect(response).to have_http_status(502)
     end
 
     it "returns the Heroku error message" do
+      subdomain = "cool-subdomain"
+      stub_successful_cname_registration(app_name, subdomain)
       stub_failed_app_setup(
         app_name,
         id: "foo_bar",
         message: "Foo failed to bar"
       )
 
-      api_post api_apps_path, "cool-subdomain"
+      api_post api_apps_path, subdomain
 
       expect(json_body["id"]).to eq "foo_bar"
       expect(json_body["message"]).to eq "Foo failed to bar"
@@ -72,15 +76,6 @@ describe "POST /api/apps" do
   def stub_heroku(app_name, subdomain)
     stub_app_setup(app_name)
     stub_heroku_domain(app_name, domain_for_heroku(subdomain))
-  end
-
-  def stub_dnsimple_client(subdomain)
-    client = double("DnsimpleClient")
-    allow(client).to receive(:register_cname).with(
-      subdomain,
-      "https://#{app_name}.herokuapp.com"
-    ).and_return("http://#{subdomain}.#{ENV.fetch("DNSIMPLE_DOMAIN")}")
-    allow(DnsimpleClient).to receive(:new).and_return(client)
   end
 
   def domain_for_heroku(subdomain)
