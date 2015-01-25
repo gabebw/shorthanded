@@ -25,10 +25,14 @@ class Api::V1::AppsController < Api::V1::ApisController
   end
 
   def subdomain
-    SubdomainNameGenerator.new.generate
+    app_params[:subdomain]
   end
 
   def app_name
     @app_name ||= HerokuAppNameGenerator.new.generate
+  end
+
+  def app_params
+    params.require(:app).permit(:subdomain)
   end
 end

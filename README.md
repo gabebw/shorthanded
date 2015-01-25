@@ -10,7 +10,8 @@ deployment of the application. The unique URL is a Heroku-esque subdomain like
 
 ## The full workflow
 
-1. A request hits the API (see below for more about the API).
+1. A request hits the API and provides a subdomain in the params (see below for
+   more about the API).
 2. A Heroku app is created with a semi-random name. It's only semi-random
    because it has a (configurable) prefix like "shorty-" or "custom-" to make
    generated apps easy to find in your Heroku console.
@@ -19,8 +20,8 @@ deployment of the application. The unique URL is a Heroku-esque subdomain like
    `$URL_OF_TAR_GZ_TO_DEPLOY`. The .tar.gz must be an app with an [app.json] in
    the root, which will tell Heroku what environment variables to set and
    generally how to deploy that app.
-4. A random Heroku-esque subdomain is created on your DNSimple domain.
-5. The subdomain is mapped to the Heroku application
+4. The provided subdomain is created on your DNSimple domain.
+5. The subdomain is mapped to the Heroku application.
 6. Voila, it's all wired up, from DNSimple -> Heroku.
 
 [app.json]: https://devcenter.heroku.com/articles/app-json-schema
@@ -28,6 +29,16 @@ deployment of the application. The unique URL is a Heroku-esque subdomain like
 ## What's the API?
 
 `POST /apps`
+
+Required params (in JSON):
+
+```json
+{
+  "app": {
+    "subdomain": "whatever-subdomain-you-want"
+  }
+}
+```
 
 Required headers:
 
