@@ -61,8 +61,9 @@ Status code: 201 Created
 
 Status code: 502 Bad Gateway
 
-Failure is directly from Heroku's create action, because that's the only thing
-that should fail, and even that is unlikely, but here's an example:
+Failure is directly from Heroku or DNSimple, depending on which failed.
+
+Example Heroku response:
 
 ```json
 {
@@ -71,7 +72,13 @@ that should fail, and even that is unlikely, but here's an example:
 }
 ```
 
-The `id` and `message` keys should always be present.
+Example DNSimple response:
+
+```json
+{
+  "message": "CNAME hello.yourdomain.com already exists so it was ignored."
+}
+```
 
 ## OK, how do I deploy this?
 

@@ -4,7 +4,7 @@ describe "POST /api/apps" do
   context "when it succeeds" do
     it "responds with the URL of the new Heroku app" do
       subdomain = "cool-subdomain"
-      stub_successful_cname_registration(app_name, subdomain)
+      stub_dnsimple(app_name, subdomain)
       stub_heroku(app_name, subdomain)
 
       api_post api_apps_path, subdomain
@@ -16,7 +16,7 @@ describe "POST /api/apps" do
 
     it "responds with 201 Created" do
       subdomain = "cool-subdomain"
-      stub_successful_cname_registration(app_name, subdomain)
+      stub_dnsimple(app_name, subdomain)
       stub_heroku(app_name, subdomain)
 
       api_post api_apps_path, subdomain
@@ -28,7 +28,7 @@ describe "POST /api/apps" do
   context "when Heroku fails" do
     it "returns 502 (Bad Response from Upstream Server)" do
       subdomain = "cool-subdomain"
-      stub_successful_cname_registration(app_name, subdomain)
+      stub_dnsimple(app_name, subdomain)
       stub_failed_app_setup(app_name)
 
       api_post api_apps_path, subdomain
@@ -38,7 +38,7 @@ describe "POST /api/apps" do
 
     it "returns the Heroku error message" do
       subdomain = "cool-subdomain"
-      stub_successful_cname_registration(app_name, subdomain)
+      stub_dnsimple(app_name, subdomain)
       stub_failed_app_setup(
         app_name,
         id: "foo_bar",
@@ -49,6 +49,32 @@ describe "POST /api/apps" do
 
       expect(json_body["id"]).to eq "foo_bar"
       expect(json_body["message"]).to eq "Foo failed to bar"
+    end
+  end
+
+  context "when DNSimple fails" do
+    it "returns 502 (Bad Response from Upstream Server)" do
+      subdomain = "cool-subdomain"
+      stub_failed_cname_registration(subdomain, "#{app_name}.herokuapp.com")
+      stub_heroku(app_name, subdomain)
+
+      api_post api_apps_path, subdomain
+
+      expect(response).to have_http_status(502)
+    end
+
+    it "returns the DNSimple response" do
+      subdomain = "cool-subdomain"
+      stub_failed_cname_registration(
+        subdomain,
+        "#{app_name}.herokuapp.com",
+        "failure"
+      )
+      stub_heroku(app_name, subdomain)
+
+      api_post api_apps_path, subdomain
+
+      expect(json_body["message"]).to eq "failure"
     end
   end
 
@@ -71,6 +97,10 @@ describe "POST /api/apps" do
 
   def app_name
     @app_name ||= stub_app_name("abcdef-1234")
+  end
+
+  def stub_dnsimple(app_name, subdomain)
+    stub_successful_cname_registration(subdomain, "#{app_name}.herokuapp.com")
   end
 
   def stub_heroku(app_name, subdomain)

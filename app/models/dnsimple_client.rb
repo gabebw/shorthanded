@@ -5,6 +5,8 @@ class DnsimpleClient
     )
   end
 
+  attr_reader :full_domain
+
   def register_cname(subdomain, url)
     record_attributes = {
       content: url.sub(%r{https?://}, ""),
@@ -15,11 +17,21 @@ class DnsimpleClient
 
     begin
       client.domains.create_record(domain_name, record_attributes)
-      "http://#{subdomain}.#{domain_name}"
+      @succeeded = true
+      @full_domain = "http://#{subdomain}.#{domain_name}"
     rescue Dnsimple::RequestError => error
       Rails.logger.error("[DNSIMPLE CLIENT] " + error.response.body)
-      false
+      @error_response = JSON.parse(error.response.body)
+      @succeeded = false
     end
+  end
+
+  def creation_error_response
+    @error_response
+  end
+
+  def cname_registration_succeeded?
+    @succeeded
   end
 
   private

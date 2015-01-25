@@ -3,9 +3,13 @@ class Api::V1::AppsController < Api::V1::ApisController
     heroku_client = create_and_deploy(app_name)
 
     if heroku_client.creation_succeeded?
-      full_domain = register_cname(heroku_client.app_url)
-      heroku_client.add_domain(full_domain)
-      render json: { url: full_domain }, status: 201
+      dnsimple_client = register_cname(heroku_client.app_url)
+      if dnsimple_client.cname_registration_succeeded?
+        heroku_client.add_domain(dnsimple_client.full_domain)
+        render json: { url: dnsimple_client.full_domain }, status: 201
+      else
+        render json: dnsimple_client.creation_error_response, status: 502
+      end
     else
       render json: heroku_client.creation_error_response, status: 502
     end
@@ -20,8 +24,9 @@ class Api::V1::AppsController < Api::V1::ApisController
   end
 
   def register_cname(url)
-    dnsimple_client = DnsimpleClient.new
-    dnsimple_client.register_cname(subdomain, url)
+    DnsimpleClient.new.tap do |dnsimple_client|
+      dnsimple_client.register_cname(subdomain, url)
+    end
   end
 
   def subdomain
